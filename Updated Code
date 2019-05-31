@@ -1,0 +1,145 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Random;
+
+public class Main {
+	public static ArrayList<int[]> comb;
+
+	public static void main(String[] args) {
+		Random rand = new Random(); 
+		int n = 0; 
+		while(n == 0) {
+			n = rand.nextInt(9); //N RECEBE NUMERO ALEATORIO, INTEIRO E NAO NULO EM UM RANGE DE 0 A 9
+		}
+//		System.out.println(n);
+		//ESCOPO DE DECLARAÇÃO DE VARIAVEIS
+		int mat[][] = new int[n][n]; // CRIA MATRIZ N POR N (PESSOAS = LINHAS; TAREFAS = COLUNAS)
+		int matAux[][] = new int[n][n];
+		int fat, aux = -1, soma = 0, aux2 = 0; 		int[] vetA = new int[n]; //CRIA VETOR A, ARMAZENARÁ CADA COMBINACAO PESSOA-TAREFA
+		comb = new ArrayList<int[]>(); //ARRAY QUE ARMAZENA VETORES A
+		fat = fatorial(n); //FATORIAL DE N = TOTAL DE COMBINACOES POSSIVEIS
+		int[] vetB = new int[fat]; //VETOR B, ARMAZENA SOMATORIO DE COMBINACOES PESSOA-TAREFA
+		
+		//MONTA MATRIZ COM VALORES NÃO NULOS
+		for(int i=0; i<n; i++) {
+			for(int j=0; j<n; j++) {
+				do {
+					mat[i][j] = rand.nextInt(9);
+				} while (mat[i][j] <= 0); //CONDICAO DE NAO NULIDADE
+			}
+		}
+		// FIM MONTAGEM MATRIZ
+		
+		//FAZ BACKUP MATRIZ ORIGINAL
+		for(int i=0; i<n; i++) {
+			for(int j=0; j<n; j++) {
+				matAux[i][j] = mat[i][j]; 
+			}
+		}
+		// FIM BACKUP
+		
+		//INICIA PROCESSO DE ITERACOES (QUANTIDADE DE ITERACOES = TOTAL DE COMBINACOES POSSIVEIS)
+		for(int k=0; k<fat; k++) {
+			if(comb.isEmpty()) { //VERIFICA SE ARRAY ESTÁ VAZIA
+				//INICIO MONTAGEM VETOR
+				for(int i=0; i<n; i++) { 
+					do { //AUX RECEBE INDICE DE COLUNA DA MATRIZ SEM FLAG
+						aux2 = rand.nextInt(n);
+						aux = mat[i][aux2]; //MANTÉM LINHA, VARIA COLUNA (PARA COLUNA ALEATÓRIA E DIF DE -1
+					} while(aux == -1);
+					vetA[i] = mat[i][aux2]; 
+					//COLOCA FLAG (-1) NA COLUNA DA TAREFA QUE FOI ASSOCIADA
+					for(int j=0; j<n; j++) {
+						mat[j][aux2] = -1; //VARIA LINHA, MANTÉM COLUNA CONSTANTE
+					}
+					// FIM SET FLAG
+				}
+				// FIM MONATGEM VETOR A
+				
+				//SOMA TODOS OS CUSTOS DO VETOR DE COMBINACOES CRIADO (PARA FAZER COMPARATIVO POSTERIORMENTE)
+				for(int i=0; i<n; i++) {
+					soma = soma + vetA[i];
+				}
+				// FIM SOMATORIO
+				
+				vetB[k] = soma; //VETOR B RECEBE SOMATORIO (PARA SE FAZER COMPARATIVO POSTERIORMENTE)
+				comb.add(vetA);//ADICIONASSE O VETOR A EM UMA ARRAY, PARA COMPARA COM VETORES ANTERIORES E EVITAR COMBINACOES REPETIDAS
+				
+				//REINICIA MATRIZ
+				for(int i=0; i<n; i++) {
+					for(int j=0; j<n; j++) {
+						mat[i][j] = matAux[i][j];
+					}
+				}
+				// FIM REINICIA MATRIZ
+				
+			} else{ // CASO A ARRAY NÃO ESTEJA VAZIA
+				
+				//INICIO DE LOOP
+				do {
+					for(int i=0; i<n; i++) {
+						do {
+							aux2 = rand.nextInt(n); 
+							aux = mat[i][aux2]; 
+						} while(aux == -1);
+						vetA[i] = mat[i][aux2]; // ADD A POSICAO DA MATRIZ NO VETOR A
+						
+						//SETA FLAG NA COLUNA UTILIZADA
+						for(int j=0; j<n; j++) {
+							mat[j][aux2] = -1; 						
+						}
+						//FIM SET FLAG
+					}
+				} while(theresAnEqual(comb, vetA) == true); //CRIA OUTRO VETOR CASO O RECEM CRIADO SEJA IGUAL A ALGUM ARMAZENADO NA ARRAY comb
+				//FIM LOOP
+				
+				//SOMATORIO DE CUSTOS DO VETOR CRIADO
+				for(int i=0; i<n; i++) {
+					soma = soma + vetA[i];
+				}
+				//FIM SOMATORIO
+				vetB[k] = soma;
+				comb.add(vetA);
+				
+				//REINICIA MATRIZ
+				for(int i=0; i<n; i++) {
+					for(int j=0; j<n; j++) {
+						mat[i][j] = matAux[i][j];
+					}
+				}
+				//FIM REINICIO MATRIZ
+			} 
+      //FIM ELSE
+		}
+    //FIM DO LOOP DE ITERACOES POSSIVEIS
+		Arrays.sort(vetB); //ORDENA VETOR B
+		System.out.println("O menor custo possível é " + vetB[0]); //O MENOR CUSTO É O MENOR VALOR DO VETOR B
+		
+	}
+	
+	//ESCOPO DAS FUNÇÕES
+	public static int fatorial(int num) {
+		if (num <=1 )  return 1;
+		else  return num * fatorial(num - 1);
+	}
+	
+	public static boolean theresAnEqual(ArrayList<int[]> array, int[] vetAux) {
+		Iterator<int[]> it = array.iterator();
+		int i=0;
+		while(it.hasNext()) {
+			int[] vet = new int[array.get(0).length];
+			vet = it.next();
+			if(vet.equals(vetAux)) {
+				i++;
+			}	
+		}
+		if(i == 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}
+
+
