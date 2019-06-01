@@ -79,7 +79,7 @@ public class Main {
 				//INICIO DE LOOP
 				do {
 					for(int i=0; i<n; i++) {
-						do {
+						do { 
 							aux2 = rand.nextInt(n); 
 							aux = mat[i][aux2]; 
 						} while(aux == -1);
